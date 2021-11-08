@@ -18,6 +18,8 @@ interface CartProviderData {
 const CartContext = createContext<CartProviderData>({} as CartProviderData);
 
 export const CartProvider = ({ children }: CartProps) => {
+  toast.configure();
+
   const { UserToken, id } = useUser();
   const [cart, setCart] = useState<Product[]>([] as Product[]);
 
@@ -45,7 +47,10 @@ export const CartProvider = ({ children }: CartProps) => {
         getCart();
         toast.success("Produto adicionado com sucesso!");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        toast.error("Produto não foi adicionado!");
+      });
   };
 
   const removeFromCart = (id: number) => {

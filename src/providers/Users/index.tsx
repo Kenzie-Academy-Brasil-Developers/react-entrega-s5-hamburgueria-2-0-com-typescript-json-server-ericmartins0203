@@ -1,6 +1,7 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import api from "../../services/api";
+import { toast } from "react-toastify";
 
 const UserContext = createContext<UserProviderData>({} as UserProviderData);
 
@@ -30,6 +31,8 @@ interface UserProviderData {
 }
 
 export const UserProvider = ({ children }: UserProps) => {
+  toast.configure();
+
   const history = useHistory();
   const [isLoged, setIsLoged] = useState(false);
   const [UserToken, setUserToken] = useState(
@@ -42,26 +45,35 @@ export const UserProvider = ({ children }: UserProps) => {
       .post("login", userData)
       .then((response) => {
         localStorage.setItem("token", response.data.accessToken);
+        toast.success("Parabéns, você esta logado!");
         setId(response.data.user.id);
         setUserToken(response.data.accessToken);
         setIsLoged(true);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        toast.error("Erro, ao tentar logar!");
+      });
   };
 
   const Logout = () => {
     localStorage.clear();
+    toast.success("Você esta deslogado!");
     setUserToken("");
     setIsLoged(false);
-    console.log(isLoged);
-    history.push("/");
   };
 
   const SignUp = (userData: RegisterUserData) => {
-    api.post("register", userData).catch((err) => {
-      console.log(err);
-      history.push("/register");
-    });
+    api
+      .post("register", userData)
+      .then(() => {
+        history.push("/login");
+        toast.success("Parabéns, você criou uma conta!");
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Erro, ao tentar logar!");
+      });
   };
 
   return (

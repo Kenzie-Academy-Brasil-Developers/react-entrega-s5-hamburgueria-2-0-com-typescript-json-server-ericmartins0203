@@ -1,7 +1,7 @@
 import { Product } from "../../types/product";
 import { AiTwotoneDelete } from "react-icons/ai";
 import { useCart } from "../../providers/Cart";
-import { Container, Botton, Top, RightSide, DeleteButton } from "./styles";
+import { Container, Top, RightSide, DeleteButton } from "./styles";
 import { useEffect } from "react";
 
 interface CardCartProps {
@@ -9,7 +9,7 @@ interface CardCartProps {
 }
 
 export const CardCart = ({ item }: CardCartProps) => {
-  const { cart, addToCart, removeFromCart } = useCart();
+  const { cart, removeFromCart } = useCart();
 
   useEffect(() => {}, [cart]);
 
