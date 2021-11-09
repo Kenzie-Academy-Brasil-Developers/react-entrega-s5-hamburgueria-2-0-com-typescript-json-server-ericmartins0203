@@ -72,7 +72,7 @@ export const UserProvider = ({ children }: UserProps) => {
       })
       .catch((err) => {
         console.log(err);
-        toast.error("Erro, ao tentar logar!");
+        toast.error("Erro, ao criar logar!");
       });
   };
 
