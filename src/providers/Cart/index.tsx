@@ -10,9 +10,12 @@ interface CartProps {
 
 interface CartProviderData {
   cart: Product[];
+  setCart: (data: Product[]) => void;
   getCart: () => void;
   addToCart: (product: Product) => void;
+  oneLessItem: (product: Product) => void;
   removeFromCart: (id: number) => void;
+  cleanCart: () => void;
 }
 
 const CartContext = createContext<CartProviderData>({} as CartProviderData);
@@ -37,20 +40,80 @@ export const CartProvider = ({ children }: CartProps) => {
   };
 
   const addToCart = (product: Product) => {
-    api
-      .post<Product[]>("/cart", product, {
-        headers: {
-          Authorization: `Bearer ${UserToken}`,
-        },
-      })
-      .then(() => {
-        getCart();
-        toast.success("Produto adicionado com sucesso!");
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Produto não foi adicionado!");
-      });
+    console.log(product);
+    let newProduct = {
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      img: product.img,
+      id: cart.length + 1,
+      quantity: 1,
+    };
+
+    const findProduct = cart.find((item) => item.name === product.name);
+    console.log(findProduct);
+
+    findProduct
+      ? api
+          .patch(
+            `cart/${findProduct.id}`,
+            { quantity: findProduct.quantity + 1 },
+            {
+              headers: {
+                Authorization: `Bearer ${UserToken}`,
+              },
+            }
+          )
+          .then(() =>
+            toast.success(`Mais um ${findProduct.name} adicionado ao carrinho.`)
+          )
+      : api
+          .post<Product[]>("/cart", newProduct, {
+            headers: {
+              Authorization: `Bearer ${UserToken}`,
+            },
+          })
+          .then(() => {
+            getCart();
+            toast.success(`${newProduct.name} adicionado com sucesso!`);
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error("Produto não foi adicionado!");
+          });
+  };
+
+  const oneLessItem = (product: Product) => {
+    const findProduct = cart.find((item) => item.name === product.name);
+
+    findProduct && findProduct.quantity >= 2
+      ? api
+          .patch(
+            `cart/${findProduct.id}`,
+            { quantity: findProduct.quantity - 1 },
+            {
+              headers: {
+                Authorization: `Bearer ${UserToken}`,
+              },
+            }
+          )
+          .then(() =>
+            toast.success(`Um ${findProduct.name} foi removido do carrinho.`)
+          )
+      : api
+          .delete(`/cart/${product.id}`, {
+            headers: {
+              Authorization: `Bearer ${UserToken}`,
+            },
+          })
+          .then(() => {
+            getCart();
+            toast.success(`${product.name} foi removido do carrinho.`);
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error("Produto não foi removido!");
+          });
   };
 
   const removeFromCart = (id: number) => {
@@ -69,13 +132,35 @@ export const CartProvider = ({ children }: CartProps) => {
         toast.error("Produto não foi removido!");
       });
   };
+
+  const cleanCart = () => {
+    cart.map((element) =>
+      api
+        .delete<number>(`/cart/${element.id}`, {
+          headers: {
+            Authorization: `Bearer ${UserToken}`,
+          },
+        })
+        .then(() => {})
+        .catch((err) => {
+          console.log(err);
+          toast.error("Produto não foi removido!");
+        })
+    );
+    toast.error("Carrinho limpo!");
+    getCart();
+  };
+
   return (
     <CartContext.Provider
       value={{
         cart,
+        setCart,
         getCart,
         addToCart,
+        oneLessItem,
         removeFromCart,
+        cleanCart,
       }}
     >
       {children}

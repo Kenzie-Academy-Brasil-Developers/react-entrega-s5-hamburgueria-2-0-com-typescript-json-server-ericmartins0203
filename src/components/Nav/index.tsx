@@ -11,30 +11,36 @@ import {
   Button,
   ButtonClean,
   TotalPrice,
+  CartNumber,
+  FaShoppingPosition,
 } from "./styles";
 import { CgSearch } from "react-icons/cg";
 import { FaShoppingCart } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "../../providers/Users";
 import { FiLogIn } from "react-icons/fi";
 import { useHistory } from "react-router";
 import { useCart } from "../../providers/Cart";
 import { CardCart } from "../CardCart";
+import api from "../../services/api";
+import { toast } from "react-toastify";
 
 interface NavProps {
   setInputSearch: (name: string) => void;
 }
 
 export const Nav = ({ setInputSearch }: NavProps) => {
+  const [search, setSearch] = useState("");
+  const [showSearch, setShowSearch] = useState<boolean>(false);
   const [isCart, setIsCart] = useState<boolean>(false);
   const [isSearch, setIsSearch] = useState<boolean>(false);
 
   const history = useHistory();
 
-  const { cart, getCart } = useCart();
+  const { cart, getCart, setCart, cleanCart } = useCart();
 
-  const { isLoged, Logout } = useUser();
+  const { isLoged, Logout, UserToken } = useUser();
 
   const HandlePage = () => {
     history.push("/login");
@@ -48,9 +54,34 @@ export const Nav = ({ setInputSearch }: NavProps) => {
 
   const HandleModalSearch = () => {
     setIsSearch(!isSearch);
+    SearchClickHandler();
   };
 
-  console.log(cart, "cart");
+  const SearchClickHandler = () => {
+    if (showSearch === false) {
+      toast.info(`Clique no botão de pesquisa novamente para voltar ao menu.`);
+      setShowSearch(true);
+      setInputSearch(search);
+    } else {
+      setShowSearch(false);
+      setInputSearch("");
+    }
+  };
+
+  useEffect(() => {
+    api
+      .get("/cart", {
+        headers: {
+          Authorization: `Bearer ${UserToken}`,
+        },
+      })
+      .then((response) => {
+        setCart(response.data);
+      })
+      .catch((err) => console.log(err));
+    // eslint-disable-next-line
+  }, [cart]);
+
   return (
     <NavContainer>
       <Logo>
@@ -61,9 +92,13 @@ export const Nav = ({ setInputSearch }: NavProps) => {
         <input
           type="text"
           placeholder="Digitar Pesquisa"
-          onChange={(e) => setInputSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
         />
-        <button onClick={() => {}}>
+        <button
+          onClick={() => {
+            SearchClickHandler();
+          }}
+        >
           <CgSearch />
         </button>
       </Search>
@@ -85,7 +120,10 @@ export const Nav = ({ setInputSearch }: NavProps) => {
 
       <NavOptions>
         <Button onClick={() => HandleCart()}>
-          <FaShoppingCart />
+          <FaShoppingPosition>
+            <FaShoppingCart />
+          </FaShoppingPosition>
+          <CartNumber>{cart.length}</CartNumber>
         </Button>
         {isCart && (
           <CartModal>
@@ -107,14 +145,22 @@ export const Nav = ({ setInputSearch }: NavProps) => {
                         R${" "}
                         {cart
                           .reduce(
-                            (acc, element) => acc + Number(element.price),
+                            (acc, element) =>
+                              acc +
+                              Number(element.price) * Number(element.quantity),
                             0
                           )
                           .toFixed(2)
                           .replace(".", ",")}
                       </span>
                     </h3>
-                    <ButtonClean>Remover todos</ButtonClean>
+                    <ButtonClean
+                      onClick={() => {
+                        cleanCart();
+                      }}
+                    >
+                      Remover todos
+                    </ButtonClean>
                   </TotalPrice>
                 ) : (
                   <>

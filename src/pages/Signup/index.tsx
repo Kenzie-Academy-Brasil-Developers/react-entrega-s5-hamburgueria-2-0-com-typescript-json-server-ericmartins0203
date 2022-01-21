@@ -42,14 +42,14 @@ export const Signup = () => {
     formState: { errors },
   } = useForm<RegisterUserData>({ resolver: yupResolver(schema) });
 
-  const onSubmit = (data: RegisterUserData) => {
+  const onSubmitButton = (data: RegisterUserData) => {
     console.log(data);
     SignUp(data);
   };
 
   return (
     <Container>
-      <Form onClick={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onSubmitButton)}>
         <h1>Cadastro</h1>
         <ButtonLogin
           onClick={() => {

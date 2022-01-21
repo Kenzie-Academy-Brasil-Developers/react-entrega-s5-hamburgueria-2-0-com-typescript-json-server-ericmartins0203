@@ -19,14 +19,20 @@ export const Home = () => {
 
   useEffect(() => {
     getProducts();
+    // eslint-disable-next-line
   }, []);
+
   return (
     <>
       <Nav setInputSearch={setInputSearch} />
       <Container>
-        {inputSearch
+        {inputSearch.length !== 0
           ? products
-              .filter((item) => item.name === inputSearch)
+              .filter(
+                (item) =>
+                  item.name.toLowerCase().includes(inputSearch) ||
+                  item.category.toLowerCase().includes(inputSearch)
+              )
               .map((item, index) => (
                 <Card key={index} item={item} btnAction={addToCart} />
               ))

@@ -1,17 +1,33 @@
 import { Product } from "../../types/product";
 import { AiTwotoneDelete } from "react-icons/ai";
 import { useCart } from "../../providers/Cart";
-import { Container, Top, RightSide, DeleteButton } from "./styles";
+import { Container, Top, RightSide, DeleteButton, Botton } from "./styles";
 import { useEffect } from "react";
+import { useUser } from "../../providers/Users";
+import api from "../../services/api";
 
 interface CardCartProps {
   item: Product;
 }
 
 export const CardCart = ({ item }: CardCartProps) => {
-  const { cart, removeFromCart } = useCart();
+  const { cart, setCart, removeFromCart, addToCart, oneLessItem } = useCart();
 
-  useEffect(() => {}, [cart]);
+  const { UserToken } = useUser();
+
+  useEffect(() => {
+    api
+      .get("/cart", {
+        headers: {
+          Authorization: `Bearer ${UserToken}`,
+        },
+      })
+      .then((response) => {
+        setCart(response.data);
+      })
+      .catch((err) => console.log(err));
+    // eslint-disable-next-line
+  }, [cart]);
 
   return (
     <Container>
@@ -23,13 +39,11 @@ export const CardCart = ({ item }: CardCartProps) => {
             <AiTwotoneDelete />
           </DeleteButton>
         </Top>
-        {/* <Botton>
-          <button onClick={() => removeFromCart(item.id)}>-</button>
-          <div>
-            {cart.filter((element) => element.name === item.name).length}
-          </div>
+        <Botton>
+          <button onClick={() => oneLessItem(item)}>-</button>
+          <div>{item.quantity}</div>
           <button onClick={() => addToCart(item)}>+</button>
-        </Botton> */}
+        </Botton>
       </RightSide>
     </Container>
   );

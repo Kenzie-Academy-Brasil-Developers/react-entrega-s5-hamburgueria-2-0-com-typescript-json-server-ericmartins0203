@@ -37,16 +37,15 @@ export const LoginComponent = () => {
     formState: { errors },
   } = useForm<UserData>({ resolver: yupResolver(schema) });
 
-  const onSubmit = (data: UserData) => {
-    console.log(data);
+  const onSubmitButton = (data: UserData) => {
     SignIn(data);
   };
 
   return (
     <Container>
-      <Form onClick={handleSubmit(onSubmit)}>
+      <Form>
         <h1>Login</h1>
-        <form>
+        <form onSubmit={handleSubmit(onSubmitButton)}>
           <TextFieldEdited
             type="text"
             id="email"
@@ -63,9 +62,7 @@ export const LoginComponent = () => {
             {...register("password")}
           />
           {errors.email?.message}
-          <LoginButton type="submit" onClick={() => history.push("/")}>
-            Logar
-          </LoginButton>
+          <LoginButton type="submit">Logar</LoginButton>
         </form>
         <RegisterContainer>
           <span>

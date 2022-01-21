@@ -45,10 +45,12 @@ export const UserProvider = ({ children }: UserProps) => {
       .post("login", userData)
       .then((response) => {
         localStorage.setItem("token", response.data.accessToken);
-        toast.success("Parabéns, você esta logado!");
         setId(response.data.user.id);
         setUserToken(response.data.accessToken);
         setIsLoged(true);
+        console.log("logou");
+        history.push("/");
+        toast.success(`Bem vindo, ${response.data.user.name}!`);
       })
       .catch((err) => {
         console.log(err);
@@ -72,7 +74,7 @@ export const UserProvider = ({ children }: UserProps) => {
       })
       .catch((err) => {
         console.log(err);
-        toast.error("Erro, ao criar logar!");
+        toast.error("Erro, ao criar conta!");
       });
   };
 

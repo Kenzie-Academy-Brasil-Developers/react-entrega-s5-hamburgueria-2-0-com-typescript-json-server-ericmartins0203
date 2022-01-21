@@ -43,20 +43,21 @@ export const Top = styled.div`
 
 export const Botton = styled.div`
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   margin-top: 10px;
   border: 1px solid var(--gray-100);
-  width: 29%;
+  width: 22%;
   button {
     font-weight: 700;
     font-size: 16px;
     border: none;
+    width: 40px;
     padding: 0.3rem;
     color: red;
   }
   div {
     text-align: center;
-    width: 40px;
+    width: 60px;
   }
 `;

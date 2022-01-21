@@ -223,3 +223,24 @@ export const TotalPrice = styled.div`
     margin-left: 62%;
   }
 `;
+
+export const FaShoppingPosition = styled.div`
+  position: relative;
+  bottom: -8px;
+`;
+
+export const CartNumber = styled.div`
+  font-size: 12px;
+  z-index: 1;
+  background: var(--primary-color);
+  color: var(--gray-100);
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  left: 22px;
+  bottom: 6px;
+`;
